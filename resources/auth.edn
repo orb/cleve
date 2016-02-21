@@ -1,0 +1,7 @@
+  {:client-id        "XXX-CLIENT-ID-XXX"
+   :client-secret    "XXX-CLIENT-SECRET-XXX"
+   :scope            "publicData characterLocationRead"
+   :redirect-uri     "http://localhost:3000/CCPLZ"
+   :authorize-uri    "https://login.eveonline.com/oauth/authorize/"
+   :access-token-uri "https://login.eveonline.com/oauth/token/"
+   :verify-token-uri "https://login.eveonline.com/oauth/verify"}
