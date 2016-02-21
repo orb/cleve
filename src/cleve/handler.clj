@@ -21,7 +21,12 @@
                  [:body.container
                   [:div.well
                    [:h2 "Clojure EVE"]
-                   [:div "Hello, " (h/h (:CharacterName verify))]]])))
+                   [:a.btn.btn-default {:href "/logout"} "Logout"]]]
+
+                 [:h1 "Hello, " (h/h (:CharacterName verify))]
+                 [:img {:src
+                        (str "http://image.eveonline.com/Character/"
+                             (:CharacterID verify) "_64.jpg")}])))
 
 ;; ----------------------------------------
 
@@ -34,6 +39,7 @@
 
 (defroutes auth-routes
   (GET "/login" [] (splash-page))
+  (GET "/logout" [] (login/logout))
   (GET "/dologin" [] (login/oauth-redirect))
   (GET "/CCPLZ" [code state] (login/oauth-callback code state)))
 

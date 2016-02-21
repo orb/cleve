@@ -5,6 +5,10 @@
 (defn oauth-redirect []
   (response/redirect (oauth/authorize-uri "faketoken")))
 
+(defn logout []
+  (-> (response/redirect "/")
+      (assoc :session {})))
+
 (defn oauth-callback [code state]
   (when-let [token (oauth/get-token code)]
     (-> (response/redirect "/")
