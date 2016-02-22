@@ -11,6 +11,9 @@ Update `resources/auth.edn` with your EVE OAUTH secrets, or (better)
 copy the file to `dev-resources/auth.edn` and make your updated to
 avoid editting a git-tracked file.
 
+EVE Online applications can be registered at
+https://developers.eveonline.com/applications
+
 ## running
 
 `lein ring server-headless`

@@ -1,5 +1,6 @@
 (ns cleve.handler
-  (:require [cleve.oauth :as oauth]
+  (:require [cleve.crest :as crest]
+            [cleve.oauth :as oauth]
             [cleve.layout :as layout]
             [cleve.login :as login]
             [compojure.core :refer :all]
@@ -16,17 +17,18 @@
                  [:a.btn.btn-default {:href "/dologin"} "Login"]]]))
 
 (defn home-page [{:keys [session] :as req}]
-  (let [verify (:verify session)]
+  (let [verify (:verify session)
+        character (crest/character-info (get-in session [:oauth :access_token])
+                                        (:CharacterID verify))]
+    (println "***" character)
     (layout/page "CLEVE: welcome"
                  [:body.container
                   [:div.well
                    [:h2 "Clojure EVE"]
                    [:a.btn.btn-default {:href "/logout"} "Logout"]]]
 
-                 [:h1 "Hello, " (h/h (:CharacterName verify))]
-                 [:img {:src
-                        (str "http://image.eveonline.com/Character/"
-                             (:CharacterID verify) "_64.jpg")}])))
+                 [:h1 "Hello, " (h/h (:name character))]
+                 [:img {:src (get-in character [:portrait :128x128 :href])}])))
 
 ;; ----------------------------------------
 
@@ -54,7 +56,3 @@
 (def app
   (wrap-defaults app-routes
                  site-defaults))
-
-
-
-

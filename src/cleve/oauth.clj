@@ -1,5 +1,6 @@
 (ns cleve.oauth
-  (:require [clojure.edn :as edn]
+  (:require [cleve.crest :as crest]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clj-http.client :as http]
             [ring.util.codec :as codec]))
@@ -26,11 +27,6 @@
                      :basic-auth [(:client-id oauth2-params) (:client-secret oauth2-params)]
                      :as          :json})))
 
-
-(defn crest-request [token url]
-  (:body (http/get url {:headers {"Authorization" (str "Bearer " token)}
-                        :as :json})))
-
 (defn verify [token]
-  (crest-request token (:verify-token-uri oauth2-params)))
+  (crest/request token (:verify-token-uri oauth2-params)))
 
