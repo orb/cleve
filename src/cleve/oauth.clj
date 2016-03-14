@@ -5,7 +5,7 @@
             [clj-http.client :as http]
             [ring.util.codec :as codec]))
 
-(def oauth2-params
+(defonce oauth2-params
   (edn/read-string (slurp (io/resource "auth.edn"))))
 
 (defn authorize-uri [state]
@@ -16,15 +16,14 @@
                                     :redirect_uri  (:redirect-uri oauth2-params)
                                     :scope         (:scope oauth2-params)
                                     :state         state})))
-
-
-(defn get-token [code]
+(defn auth-request [code]
   (:body (http/post (:access-token-uri oauth2-params)
                     {:form-params {:code         code
                                    :grant_type   "authorization_code"
                                    :client_id    (:client-id oauth2-params)
                                    :redirect_uri (:redirect-uri oauth2-params)}
-                     :basic-auth [(:client-id oauth2-params) (:client-secret oauth2-params)]
+                     :basic-auth   [(:client-id oauth2-params)
+                                    (:client-secret oauth2-params)]
                      :as          :json})))
 
 (defn verify [token]

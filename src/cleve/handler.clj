@@ -16,9 +16,12 @@
                  [:h2 "Clojure EVE"]
                  [:a.btn.btn-default {:href "/dologin"} "Login"]]]))
 
+(defn token-from-session [session]
+  (get-in session [:oauth-response :access_token]))
+
 (defn home-page [{:keys [session] :as req}]
   (let [verify (:verify session)
-        character (crest/character-info (get-in session [:oauth :access_token])
+        character (crest/character-info (token-from-session session)
                                         (:CharacterID verify))]
     (println "***" character)
     (layout/page "CLEVE: welcome"
@@ -35,7 +38,7 @@
 
 (defn wrap-require-user [handler]
   (fn [req]
-    (if-let [token (get-in req [:session :oauth])]
+    (if-let [oauth-response (get-in req [:session :oauth-response])]
       (handler req)
       (response/redirect "/login"))))
 
@@ -43,7 +46,8 @@
   (GET "/login" [] (splash-page))
   (GET "/logout" [] (login/logout))
   (GET "/dologin" [] (login/oauth-redirect))
-  (GET "/CCPLZ" [code state] (login/oauth-callback code state)))
+  (GET "/CCPLZ" [code state :as {session :session}]
+       (login/oauth-callback session code state)))
 
 (defroutes main-routes
   (GET "/"      [] home-page)
