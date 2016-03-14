@@ -5,10 +5,13 @@
   (str "https://crest-tq.eveonline.com" path))
 
 (defn request [token url]
-  (println "*" token url)
-  (:body (http/get url {:headers {"Authorization" (str "Bearer " token)}
-                        :as :json})))
-
+  (println "**CREST" token)
+  (println "--GET" url)
+  (let [response
+        (http/get url {:headers {"Authorization" (str "Bearer " token)}
+                       :as :json})]
+    (println "->" response)
+    (:body response)))
 
 (defn character-info [token id]
   (request token (resource (str "/characters/" id "/"))))

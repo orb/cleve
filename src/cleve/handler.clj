@@ -20,18 +20,23 @@
   (get-in session [:oauth-response :access_token]))
 
 (defn home-page [{:keys [session] :as req}]
-  (let [verify (:verify session)
-        character (crest/character-info (token-from-session session)
-                                        (:CharacterID verify))]
-    (println "***" character)
-    (layout/page "CLEVE: welcome"
-                 [:body.container
-                  [:div.well
-                   [:h2 "Clojure EVE"]
-                   [:a.btn.btn-default {:href "/logout"} "Logout"]]]
+  (try
+    (let [verify (:verify session)
+          character (crest/character-info (token-from-session session)
+                                          (:CharacterID verify))]
+      (layout/page "CLEVE: welcome"
+                   [:body.container
+                    [:div.well
+                     [:h2 "Clojure EVE"]
+                     [:a.btn.btn-default {:href "/logout"} "Logout"]]]
 
-                 [:h1 "Hello, " (h/h (:name character))]
-                 [:img {:src (get-in character [:portrait :128x128 :href])}])))
+                   [:h1 (h/h (:name character))]
+                   [:h2 (h/h (get-in [:corporation :name] character))]
+                   [:img {:src (get-in character [:portrait :128x128 :href])}]))
+    (catch Exception e
+      (.printStackTrace e)
+      (-> (response/redirect "/login")
+          (assoc :session {})))))
 
 ;; ----------------------------------------
 
