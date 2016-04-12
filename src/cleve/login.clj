@@ -5,7 +5,6 @@
 (defn make-state []
   (str (java.util.UUID/randomUUID)))
 
-
 (defn oauth-redirect []
   (let [state (make-state)]
     (-> (response/redirect (oauth/authorize-uri state))

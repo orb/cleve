@@ -16,6 +16,14 @@
                  [:h2 "Clojure EVE"]
                  [:a.btn.btn-default {:href "/dologin"} "Login"]]]))
 
+(defn error-page []
+  (layout/page "CLEVE: error"
+               [:body.container
+                [:div.well
+                 [:h2 "Clojure EVE"]
+                 [:p "Sorry, it looks like the EVE proxy is sad."]
+                 [:a.btn.btn-default {:href "/dologin"} "Try again?"]]]))
+
 (defn token-from-session [session]
   (get-in session [:oauth-response :access_token]))
 
@@ -23,19 +31,29 @@
   (try
     (let [verify (:verify session)
           character (crest/character-info (token-from-session session)
-                                          (:CharacterID verify))]
+                                          (:CharacterID verify))
+          location (crest/request (token-from-session session)
+                                  (get-in character [:location :href]))]
+      #_(println "!!!!" character)
+      (println "@" location)
       (layout/page "CLEVE: welcome"
                    [:body.container
                     [:div.well
                      [:h2 "Clojure EVE"]
-                     [:a.btn.btn-default {:href "/logout"} "Logout"]]]
+                     [:a.btn.btn-default {:href "/logout"} "Logout"]]
 
-                   [:h1 (h/h (:name character))]
-                   [:h2 (h/h (get-in [:corporation :name] character))]
-                   [:img {:src (get-in character [:portrait :128x128 :href])}]))
+
+                    [:div.row
+                     [:div.col-sm-3 [:img {:src (get-in character [:portrait :256x256 :href])}]]
+                     [:div.col-sm-9
+                      [:h1 (h/h (:name character))]
+                      [:h2 (h/h (get-in character [:corporation :name]))]
+                      (if-let [system (get-in location [:solarSystem :name])]
+                        [:h2 "Current Location: " (h/h system)]
+                        [:h2 "Offline"])]]]))
     (catch Exception e
       (.printStackTrace e)
-      (-> (response/redirect "/login")
+      (-> (response/redirect "/error")
           (assoc :session {})))))
 
 ;; ----------------------------------------
@@ -49,6 +67,7 @@
 
 (defroutes auth-routes
   (GET "/login" [] (splash-page))
+  (GET "/error" [] (error-page))
   (GET "/logout" [] (login/logout))
   (GET "/dologin" [] (login/oauth-redirect))
   (GET "/CCPLZ" [code state :as {session :session}]

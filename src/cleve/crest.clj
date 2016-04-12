@@ -10,10 +10,11 @@
   (let [response
         (http/get url {:headers {"Authorization" (str "Bearer " token)}
                        :as :json})]
-    (println "->" response)
+    #_(println "->" response)
     (:body response)))
 
 (defn character-info [token id]
   (request token (resource (str "/characters/" id "/"))))
+
 
 
